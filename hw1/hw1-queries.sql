@@ -19,5 +19,5 @@ where z.totalmovies > 500 order by z.totalmovies desc
 6 (only 137 returned) select aa.fname, aa.lname, cc.role from (select z.id, z.mid from (select a.id, a.fname, a.lname, m.id as mid, count(c.role) as roles from actor a, casts c, movie m where a.id = c.pid and c.mid = m.id and m.year = 2010 group by a.id, a.fname, a.lname, m.id) z
 where z.roles >= 5) w, actor aa, casts cc where w.id = aa.id and aa.id = cc.pid and cc.mid = w.mid;
 
-7 select mm.year, count(mm.id) from movie mm where mm.id not in (select m.id from actor a, casts c, movie m where a.id = c.pid and c.mid = m.id and a.gender = 'M' group by m.id) group by mm.year;
+7 select mm.year, count(mm.id) from movie mm where mm.id not in (select distinct m.id from actor a, casts c, movie m where a.id = c.pid and c.mid = m.id and a.gender = 'M') group by mm.year;
  
