@@ -20,4 +20,15 @@ where z.totalmovies > 500 order by z.totalmovies desc
 where z.roles >= 5) w, actor aa, casts cc where w.id = aa.id and aa.id = cc.pid and cc.mid = w.mid;
 
 7 select mm.year, count(mm.id) from movie mm where mm.id not in (select distinct m.id from actor a, casts c, movie m where a.id = c.pid and c.mid = m.id and a.gender = 'M') group by mm.year;
+
+
+8 -select z.year, (((cast (z.c as float))/ x.c) * 100) 
+from (select mm.year, count(mm.id) as c from movie mm where mm.id not in (select distinct m.id from actor a, casts c, movie m where a.id = c.pid and c.mid = m.id and a.gender = 'M') group by mm.year) z,
+(select m.year, count(m.id) as c from movie m group by m.year) x
+where z.year = x.year
+
+
+9 - select w.name, w.c from (select max(z.c) as max_actors from (select m.id, m.name, count(distinct c.pid) as c from movie m, casts c where m.id = c.mid group by m.name, m.id) z) y, 
+(select m.id, m.name, count(distinct c.pid) as c from movie m, casts c where m.id = c.mid group by m.name, m.id) w
+where w.c = y.max_actors
  
