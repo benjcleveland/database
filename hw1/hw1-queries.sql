@@ -32,3 +32,6 @@ where z.year = x.year
 (select m.id, m.name, count(distinct c.pid) as c from movie m, casts c where m.id = c.mid group by m.name, m.id) w
 where w.c = y.max_actors
  
+
+10 - select z.year as start, (z.year + 10) as end, z.c from (select max(w.c) as max_movies from (select y.year, count(m.name) as c from (select distinct m.year from movie m) y, movie m where m.year < y.year + 10 and m.year >= y.year group by y.year) w) y, (select y.year, count(m.name) as c from (select distinct m.year from movie m) y, movie m where m.year < y.year + 10 and m.year >= y.year group by y.year) z where z.c = y.max_movies;
+
