@@ -45,7 +45,7 @@ where w.c = y.max_actors
 
 or 
 
-explain analyze select w.name, w.c from (select max(z.c) as max_actors from (select m.id, count(distinct c.pid) as c from movie m, casts c where m.id = c.mid group by  m.id) z) y, 
+select w.name, w.c from (select max(z.c) as max_actors from (select m.id, count(distinct c.pid) as c from movie m, casts c where m.id = c.mid group by  m.id) z) y, 
 (select m.id, m.name, count(distinct c.pid) as c from movie m, casts c where m.id = c.mid group by m.name, m.id) w
 where w.c = y.max_actors
 ;
