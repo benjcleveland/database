@@ -9,6 +9,10 @@ from (select a.fname, a.lname, a.id, m.year from actor a, casts c, movie m where
 x.id = y.id;
 
 select distinct z.fname, z.lname from actor z where z.id not in(select a.id from actor a, casts c, movie m where a.id = c.pid and c.mid = m.id and m.year <= 2000 and m.year >= 1900)
+
+or
+
+select distinct a.id, a.fname, a.lname from actor a, movie m1, movie m2, casts c1, casts c2 where a.id = c1.pid and c1.mid = m1.id and m1.year < 1900 and a.id = c2.pid and c2.mid = m2.id and m2.year > 2000;
 ----
 
 4 select z.fname, z.lname, z.totalmovies from (select d.fname, d.lname, count(*) as totalmovies from directors d, movie_directors md where d.id = md.did group by d.fname, d.lname) z 
@@ -20,10 +24,17 @@ where z.totalmovies > 500 order by z.totalmovies desc
 where z.roles >= 5) w, actor aa, casts cc where w.id = aa.id and aa.id = cc.pid and cc.mid = w.mid;
 
 7 select mm.year, count(mm.id) from movie mm where mm.id not in (select distinct m.id from actor a, casts c, movie m where a.id = c.pid and c.mid = m.id and a.gender = 'M') group by mm.year;
+use this one -- select mm.year, count(mm.id) from movie mm where not exists (select * from actor a, casts c where a.id = c.pid and c.mid = mm.id and a.gender = 'M') group by mm.year
 
 
 8 -select z.year, (((cast (z.c as float))/ x.c) * 100) 
 from (select mm.year, count(mm.id) as c from movie mm where mm.id not in (select distinct m.id from actor a, casts c, movie m where a.id = c.pid and c.mid = m.id and a.gender = 'M') group by mm.year) z,
+(select m.year, count(m.id) as c from movie m group by m.year) x
+where z.year = x.year
+
+use this one ----
+select z.year, (((cast (z.c as float))/ x.c) * 100), x.c 
+from (select mm.year, count(mm.id) as c from movie mm where not exists (select * from actor a, casts c where a.id = c.pid and c.mid = mm.id and a.gender = 'M') group by mm.year) z,
 (select m.year, count(m.id) as c from movie m group by m.year) x
 where z.year = x.year
 
