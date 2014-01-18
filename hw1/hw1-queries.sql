@@ -54,6 +54,6 @@ where w.c = y.max_actors
 
 10 - select z.year as start, (z.year + 10) as end, z.c from (select max(w.c) as max_movies from (select y.year, count(m.name) as c from (select distinct m.year from movie m) y, movie m where m.year < y.year + 10 and m.year >= y.year group by y.year) w) y, (select y.year, count(m.name) as c from (select distinct m.year from movie m) y, movie m where m.year < y.year + 10 and m.year >= y.year group by y.year) z where z.c = y.max_movies;
 
-11 - well it a start...
-select count(distinct a.id) from (select distinct a.id from (select distinct m.id, m.name from actor a, casts c, movie m  where a.fname = 'Kevin' and a.lname = 'Bacon' and a.id = c.pid and c.mid = m.id) z, casts c, actor a where z.id = c.mid and a.id = c.pid) b1, casts c, actor a, movie m where b1.id = c.pid and c.mid = m.id and a.id = c.pid;
+11
+select count(distinct a1.id) from actor a1, casts c1, casts c2, (select distinct a.id from actor a, casts c1, casts c2, actor kb where kb.fname = 'Kevin' and kb.lname = 'Bacon' and kb.id = c2.pid and c2.mid = c1.mid and c1.pid = a.id and kb.id != a.id) kb1 where kb1.id = c2.pid and c2.mid = c1.mid and c1.pid = a1.id and  not exists (select distinct a.id from actor a, casts c1, casts c2, actor kb where kb.fname = 'Kevin' and kb.lname = 'Bacon' and kb.id = c2.pid and c2.mid = c1.mid and c1.pid = a.id and a1.id = a.id);
 
