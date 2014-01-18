@@ -6,22 +6,24 @@
 */
 
 /* Q.1 */
-select y.fname, y.lname from movie x, actor y, casts z where x.name = 'Officer 444' and z.mid = x.id and z.pid = y.id;
+select a.fname, a.lname from movie m, actor a, casts c where m.name = 'Officer 444' and c.mid = m.id and c.pid = a.id;
 
-2 select d.fname, d.lname, g.genre, m.year from genre g, movie m, movie_directors md, directors d where g.genre = 'Film-Noir' and g.mid = m.id and m.id = md.mid and md.did = d.id and m.year % 4 = 0;
+/* Q.2 */
+select d.fname, d.lname, m.name, m.year from genre g, movie m, movie_directors md, directors d where g.genre = 'Film-Noir' and g.mid = m.id and m.id = md.mid and md.did = d.id and m.year % 4 = 0;
 
-3 ----- (only 48 returned...)
-select x.fname, x.lname
-from (select a.fname, a.lname, a.id, m.year from actor a, casts c, movie m where a.id = c.pid and c.mid = m.id and m.year < 1900) x,
- (select a.fname, a.lname, a.id, m.year from actor a, casts c, movie m where a.id = c.pid and c.mid = m.id and m.year > 2000) y where
-x.id = y.id;
+/* Q.3 */
+select distinct a.fname, a.lname from actor a, movie m1, movie m2, casts c1, casts c2 where a.id = c1.pid and c1.mid = m1.id and m1.year < 1900 and a.id = c2.pid and c2.mid = m2.id and m2.year > 2000;
 
-select distinct z.fname, z.lname from actor z where z.id not in(select a.id from actor a, casts c, movie m where a.id = c.pid and c.mid = m.id and m.year <= 2000 and m.year >= 1900)
+/* How can actors be in movies that are more than 100 years apart? One reason is archival footage of the actor could have been used 
+in a film that was produced after the year 2000. An example of this is Queen Alexandra. */
+select * from actor a, movie m1, movie m2, casts c1, casts c2 where a.id = c1.pid and c1.mid = m1.id and m1.year < 1900 and a.id = c2.pid and c2.mid = m2.id and m2.year > 2000 and a.id = 1679737;
 
-or
-
-select distinct a.id, a.fname, a.lname from actor a, movie m1, movie m2, casts c1, casts c2 where a.id = c1.pid and c1.mid = m1.id and m1.year < 1900 and a.id = c2.pid and c2.mid = m2.id and m2.year > 2000;
-----
+/* Additionally it looks like some of the movie records were imported into the database incorrectly. For example Walter Cronkite was in 
+"The Conquest of Mexico" and the database says that movie was created in 1519, when it was actually created in 1953 
+(from http://www.imdb.com/title/tt0812976/?ref_=fn_al_tt_1). It appears like all movies with a year in the name in parenthesis were 
+imported incorrectly.
+*/
+select from movie m where m.id = 1559520;
 
 4 select z.fname, z.lname, z.totalmovies from (select d.fname, d.lname, count(*) as totalmovies from directors d, movie_directors md where d.id = md.did group by d.fname, d.lname) z 
 where z.totalmovies > 500 order by z.totalmovies desc
