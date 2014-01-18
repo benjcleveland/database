@@ -1,3 +1,11 @@
+/*
+ Ben Cleveland
+ CSEP 544
+ Homework 1
+ Create IMDB table indexes
+*/
+
+
 create unique index actor_idx on actor(id);
 
 create unique index movie_idx on movie(id);

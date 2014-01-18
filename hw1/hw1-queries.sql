@@ -1,4 +1,12 @@
-1 select y.fname, y.lname from movie x, actor y, casts z where x.name = 'Officer 444' and z.mid = x.id and z.pid = y.id;
+/*
+ Ben Cleveland
+ CSEP 544
+ Homework 1
+ IMDB SQL Queries
+*/
+
+/* Q.1 */
+select y.fname, y.lname from movie x, actor y, casts z where x.name = 'Officer 444' and z.mid = x.id and z.pid = y.id;
 
 2 select d.fname, d.lname, g.genre, m.year from genre g, movie m, movie_directors md, directors d where g.genre = 'Film-Noir' and g.mid = m.id and m.id = md.mid and md.did = d.id and m.year % 4 = 0;
 
