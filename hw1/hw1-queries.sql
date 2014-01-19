@@ -40,7 +40,7 @@ where z.roles >= 5) w, actor aa, casts cc, movie mm where w.id = aa.id and aa.id
 select mm.year, count(mm.id) from movie mm where not exists (select * from actor a, casts c where a.id = c.pid and c.mid = mm.id and a.gender = 'M') group by mm.year;
 
 /* Q.8 */
-select z.year, round((((cast (z.c as numeric))/ x.c) * 100),2) as percent, x.c 
+select z.year, round((((cast (z.c as numeric))/ x.c) * 100),2) as female_percent, x.c as movie_count
 from (select mm.year, count(mm.id) as c from movie mm where not exists (select * from actor a, casts c where a.id = c.pid and c.mid = mm.id and a.gender = 'M') group by mm.year) z,
 (select m.year, count(m.id) as c from movie m group by m.year) x
 where z.year = x.year;
@@ -51,7 +51,7 @@ select w.name, w.c from (select max(z.c) as max_actors from (select m.id, count(
 where w.c = y.max_actors;
 
 /* Q.10 */ 
-select z.year as start, (z.year + 9) as end from (select max(w.c) as max_movies from (select y.year, count(m.name) as c from (select distinct m.year from movie m) y, movie m where m.year < y.year + 10 and m.year >= y.year group by y.year) w) y, (select y.year, count(m.name) as c from (select distinct m.year from movie m) y, movie m where m.year < y.year + 10 and m.year >= y.year group by y.year) z where z.c = y.max_movies;
+select z.year as start_year, (z.year + 9) as end_year from (select max(w.c) as max_movies from (select y.year, count(m.name) as c from (select distinct m.year from movie m) y, movie m where m.year < y.year + 10 and m.year >= y.year group by y.year) w) y, (select y.year, count(m.name) as c from (select distinct m.year from movie m) y, movie m where m.year < y.year + 10 and m.year >= y.year group by y.year) z where z.c = y.max_movies;
 
 /* Q.11 */
 select count(distinct a1.id) from actor a1, casts c1, casts c2, (select distinct a.id from actor a, casts c1, casts c2, actor kb where kb.fname = 'Kevin' and kb.lname = 'Bacon' and kb.id = c2.pid and c2.mid = c1.mid and c1.pid = a.id and kb.id != a.id) kb1 where kb1.id = c2.pid and c2.mid = c1.mid and c1.pid = a1.id and  not exists (select distinct a.id from actor a, casts c1, casts c2, actor kb where kb.fname = 'Kevin' and kb.lname = 'Bacon' and kb.id = c2.pid and c2.mid = c1.mid and c1.pid = a.id and a1.id = a.id);
