@@ -30,7 +30,7 @@ select z.fname, z.lname, z.totalmovies from (select d.fname, d.lname, count(*) a
 where z.totalmovies > 500 order by z.totalmovies desc;
 
 /* Q.5 */
-select z.fname, z.lname, z.name, z.roles from (select a.fname, a.lname, m.name, count(c.role) as roles from actor a, (select distinct * from casts) c, movie m where a.id = c.pid and c.mid = m.id and m.year = 2010 group by a.fname, a.lname, m.name) z where z.roles >= 5 ;
+select z.fname, z.lname, z.name, z.roles from (select a.fname, a.lname, m.name, count(c.role) as roles from actor a, (select distinct * from casts) c, movie m where a.id = c.pid and c.mid = m.id and m.year = 2010 group by a.fname, a.lname, m.name) z where z.roles >= 5;
 
 /* Q.6 */
 select aa.fname, aa.lname, mm.name, cc.role from (select z.id, z.mid from (select a.id, a.fname, a.lname, m.id as mid, count(c.role) as roles from actor a, casts c, movie m where a.id = c.pid and c.mid = m.id and m.year = 2010 group by a.id, a.fname, a.lname, m.id) z
