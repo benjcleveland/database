@@ -26,7 +26,7 @@ imported incorrectly.
 select from movie m where m.id = 1559520;
 
 /* Also all the movies with a NULL year are being included so it is possible
-that an actor acted in a movie after 2000 and also in a movie with a NULL year, for example Own Buick. */
+that an actor acted in a movie after 2000 and also in a movie with a NULL year, for example Owen Buick. */
 select distinct a.fname, a.lname from actor a, movie m1, movie m2, casts c1, casts c2 where a.id = c1.pid and c1.mid = m1.id  and a.id = c2.pid and c2.mid = m2.id and m1.year < 1900 and (m2.year > 2000 or m2.year is NULL);
 
 
