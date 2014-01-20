@@ -12,7 +12,7 @@ select a.fname, a.lname from movie m, actor a, casts c where m.name = 'Officer 4
 select d.fname, d.lname, m.name, m.year from genre g, movie m, movie_directors md, directors d where g.genre = 'Film-Noir' and g.mid = m.id and m.id = md.mid and md.did = d.id and m.year % 4 = 0;
 
 /* Q.3 */
-select distinct a.fname, a.lname from actor a, movie m1, movie m2, casts c1, casts c2 where a.id = c1.pid and c1.mid = m1.id and m1.year < 1900 and a.id = c2.pid and c2.mid = m2.id and m2.year > 2000;
+select distinct a.fname, a.lname from actor a, movie m1, movie m2, casts c1, casts c2 where a.id = c1.pid and c1.mid = m1.id  and a.id = c2.pid and c2.mid = m2.id and m1.year < 1900 and (m2.year > 2000 or m2.year is NULL);
 
 /* How can actors be in movies that are more than 100 years apart? One reason is archival footage of the actor could have been used 
 in a film that was produced after the year 2000. An example of this is Queen Alexandra. */
@@ -24,6 +24,11 @@ select * from actor a, movie m1, movie m2, casts c1, casts c2 where a.id = c1.pi
 imported incorrectly.
 */
 select from movie m where m.id = 1559520;
+
+/* Also all the movies with a NULL year are being included so it is possible
+that an actor acted in a movie after 2000 and also in a movie with a NULL year, for example Own Buick. */
+select distinct a.fname, a.lname from actor a, movie m1, movie m2, casts c1, casts c2 where a.id = c1.pid and c1.mid = m1.id  and a.id = c2.pid and c2.mid = m2.id and m1.year < 1900 and (m2.year > 2000 or m2.year is NULL);
+
 
 /* Q.4 */
 select z.fname, z.lname, z.totalmovies from (select d.fname, d.lname, count(*) as totalmovies from directors d, movie_directors md where d.id = md.did group by d.fname, d.lname) z 
