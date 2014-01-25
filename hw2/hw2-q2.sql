@@ -23,3 +23,11 @@ create table insuranceco(name text primary key, phone int);
 /* create the person table */
 create table person(ssn int primary key, name text);
 
+/* create the driver table */
+create table driver(ssn int, licenceNo text, primary key(ssn, licenceNo));
+
+/* create the non-Pro driver table */
+create table nonProfessionalDriver(ssn int, licenceNo text, primary key(ssn, licenceNo));
+
+/* create the driver table */
+
