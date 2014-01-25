@@ -43,6 +43,10 @@ create table product_months(month char(3), name text, primary key(name, month),
     foreign key(name) references product(name),
     foreign key(month) references monthDiscount(month));
 
+/* should we keep this table...? */
+create table monthprice(month char(3), price int, 
+    primary key(month, price),
+    foreign key(month) references monthDiscount(month));
 
 insert into product(name, price) select distinct name, price from sales;
 
@@ -50,6 +54,10 @@ insert into monthDiscount(month, discount) select distinct month, discount from 
 
 insert into product_months(name, month) select distinct name, month from sales;
 
+insert into monthprice(month, price) select distinct month, price from sales;
+
 select * from product;
 select * from monthDiscount;
 select * from product_months;
+select * from monthprice;
+
