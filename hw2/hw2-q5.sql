@@ -44,10 +44,13 @@ select price, array_agg(row(name)) as prod from (select name, price from sales g
     Month, Name
 */
 /* create the BCNF tables for the database */
+/* month, discount table */
 create table monthDiscount(month char(3) primary key, discount char(3));
 
+/* name price table */
 create table product(name text primary key, price int);
 
+/* month name table */
 create table product_months(month char(3), name text, primary key(name, month),
     foreign key(name) references product(name),
     foreign key(month) references monthDiscount(month));
@@ -58,6 +61,7 @@ create table product_months(month char(3), name text, primary key(name, month),
     foreign key(month) references monthDiscount(month));
 */
 
+/* load the tables with the data */
 insert into product(name, price) select distinct name, price from sales;
 
 insert into monthDiscount(month, discount) select distinct month, discount from sales;
@@ -67,6 +71,8 @@ insert into product_months(name, month) select distinct name, month from sales;
 /*
 insert into monthprice(month, price) select distinct month, price from sales;
 */
+
+/* print out the data from the tables */
 select * from product;
 select * from monthDiscount;
 select * from product_months;
