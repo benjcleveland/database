@@ -15,7 +15,6 @@
 select month, discount from sales group by month, discount order by month;
 
 /* Functional Dependency: name->price */
-/* todo make the return smaller... */
 /* select distinct(name, price) from sales; */
 select price, array_agg(row(name)) as prod from (select name, price from sales group by name, price) as row group by price order by price;
 
