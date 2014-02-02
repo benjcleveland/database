@@ -1,3 +1,5 @@
+-- todo add comment on number of nodes and amount of time 
+
 register s3n://uw-cse344-code/myudfs.jar
 
 
@@ -14,7 +16,7 @@ rdfabout = filter ntriples by subject matches '.*rdfabout\\.com.*' PARALLEL 50;
 
 -- make a copy and rename
 -- rdfabout2 = filter ntriples by subject matches '.*rdfabout\\.com.*' as (subject2:chararray,predicate2:chararray,object2:chararray);
-rdfabout2 = foreach rdfabout generate $0 as subject2, $1 as predicate2, $2 as object2 PARALLEL 50;
+rdfabout2 = foreach rdfabout generate subject as subject2, predicate as predicate2, object as object2 PARALLEL 50;
 
 -- join
 j = join rdfabout by object, rdfabout2 by subject2 PARALLEL 50; 
