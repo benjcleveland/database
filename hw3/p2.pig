@@ -1,3 +1,7 @@
+-- Number of Nodes: 5
+-- Amount of time to run: ~6 minutes, 3 seconds
+
+
 register s3n://uw-cse344-code/myudfs.jar
 
 
