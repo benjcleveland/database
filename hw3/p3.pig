@@ -35,4 +35,4 @@ dist = DISTINCT j;
 -- order by
 ordered = order dist by predicate;
 
-store ordered into '/tmp/fo3' using PigStorage();
+store ordered into '/user/hadoop/fo3' using PigStorage();
