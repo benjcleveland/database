@@ -1,14 +1,15 @@
+-- Ben Cleveland
+-- CSEP 544
+-- Homework 3 Problem 4
+
 -- Number of Nodes: 19
--- Amount of time to run: ~6 minutes, 3 seconds
+-- Amount of time to run: ~4 hours 30 minutes
 
 
 register s3n://uw-cse344-code/myudfs.jar
 
 
 -- load the test file into Pig
--- raw = LOAD 's3n://uw-cse-344-oregon.aws.amazon.com/cse344-test-file' USING TextLoader as (line:chararray);
--- later you will load to other files, example:
--- raw = LOAD 's3n://uw-cse-344-oregon.aws.amazon.com/btc-2010-chunk-000' USING TextLoader as (line:chararray); 
 raw = LOAD 's3n://uw-cse-344-oregon.aws.amazon.com' USING TextLoader as (line:chararray);
 
 -- parse each line into ntriples
@@ -27,8 +28,6 @@ x_by_counts = group count_by_subject by count;
 
 -- Compute the final counts
 x_y = foreach x_by_counts generate flatten($0), COUNT($1) as y;
-
---order the resulting tuples by their count in descending order
 
 -- store the results in the folder /user/hadoop/example-results
 store x_y into '/user/hadoop/fo5' using PigStorage();

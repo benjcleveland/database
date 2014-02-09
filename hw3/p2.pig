@@ -1,3 +1,7 @@
+-- Ben Cleveland
+-- CSEP 544
+-- Homework 3 Problem 2
+
 -- Number of Nodes: 5
 -- Amount of time to run: ~6 minutes, 3 seconds
 
@@ -26,8 +30,6 @@ x_by_counts = group count_by_subject by count;
 
 -- Compute the final counts
 x_y = foreach x_by_counts generate flatten($0), COUNT($1) as y;
-
---order the resulting tuples by their count in descending order
 
 -- store the results in the folder /user/hadoop/example-results
 store x_y into '/user/hadoop/fo2' using PigStorage();
