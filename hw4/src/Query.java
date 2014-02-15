@@ -264,7 +264,6 @@ public class Query {
 			actor_set.close();
 			
 			/* then you have to find the status: of "AVAILABLE" "YOU HAVE IT", "UNAVAILABLE" */
-			/*
 			rentalMidStatement.clearParameters();
 			rentalMidStatement.setInt(1, mid);
 			ResultSet rental_set = rentalMidStatement.executeQuery();
@@ -277,7 +276,6 @@ public class Query {
 			}
 			System.out.println("\t\tRental Status: " + rental_status);
 			rental_set.close();
-			*/
 		}
 		movie_set.close();
 		System.out.println();
