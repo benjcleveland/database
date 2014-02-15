@@ -41,16 +41,17 @@ public class Query {
 					+ "WHERE a.id = c.pid and c.mid = ?";
 	private PreparedStatement actorMidStatement;
 	
-	private static final String RENTAL_MID_SQL = "SELECT * "
+	private static final String RENTAL_MID_SQL = "SELECT r.* "
 			+ "FROM rentals r "
-			+ "WHERE r.movie_id = ?";
+			+ "WHERE r.movie_id = ? and r.status not like 'closed'";
+	private PreparedStatement rentalMidStatement;
 
 	/* uncomment, and edit, after your create your own customer database */
-	/*
 	private static final String CUSTOMER_LOGIN_SQL = 
 		"SELECT * FROM customer WHERE login = ? and password = ?";
 	private PreparedStatement customerLoginStatement;
 
+	/*
 	private static final String BEGIN_TRANSACTION_SQL = 
 		"SET TRANSACTION ISOLATION LEVEL SERIALIZABLE; BEGIN TRANSACTION;";
 	private PreparedStatement beginTransactionStatement;
@@ -104,6 +105,21 @@ public class Query {
 		   customerConn.setAutoCommit(true); //by default automatically commit after each statement
 		   customerConn.setTransactionIsolation(...); //
 		*/
+		
+		jSQLUrl	   = configProps.getProperty("videostore.customer_url");
+
+
+		/* load jdbc drivers */
+		Class.forName(jSQLDriver).newInstance();
+
+		/* open connections to the imdb database */
+
+		customerConn = DriverManager.getConnection(jSQLUrl, // database
+						   jSQLUser, // user
+						   jSQLPassword); // password
+                
+		customerConn.setAutoCommit(true); //by default automatically commit after each statement 
+
 	        
 	}
 
@@ -131,6 +147,8 @@ public class Query {
 
 		/* add here more prepare statements for all the other queries you need */
 		actorMidStatement = conn.prepareStatement(ACTOR_MID_SQL);
+		
+		rentalMidStatement = customerConn.prepareStatement(RENTAL_MID_SQL);
 	}
 
 
@@ -184,7 +202,7 @@ public class Query {
 		cid_set.close();
 		return(cid);
 		 */
-		return (55);
+		return (2);
 	}
 
 	public void transaction_printPersonalData(int cid) throws Exception {
@@ -232,6 +250,18 @@ public class Query {
 			actor_set.close();
 			
 			/* then you have to find the status: of "AVAILABLE" "YOU HAVE IT", "UNAVAILABLE" */
+			rentalMidStatement.clearParameters();
+			rentalMidStatement.setInt(1, mid);
+			ResultSet rental_set = rentalMidStatement.executeQuery();
+			String rental_status = "AVAILABLE";
+			while(rental_set.next()) {
+				if(rental_set.getInt("cust_id") == cid)
+					rental_status = "YOU HAVE IT";
+				else
+					rental_status = "UNAVAILABLE";
+			}
+			System.out.println("\t\tRental Status: " + rental_status);
+			rental_set.close();
 		}
 		movie_set.close();
 		System.out.println();
