@@ -18,7 +18,10 @@ INSERT INTO customer VALUES (6, 'cindy', 'asdf', 'Cindy', 'Cleveland', 2);
 INSERT INTO customer VALUES (7, 'sophia', 'asdf', 'Sophia', 'Terada', 3);
 INSERT INTO customer VALUES (8, 'derek', 'asdf', 'Derek', 'Terada', 4);
 
+CREATE TABLE status(id int primary key, status text);
+
 /* create the rental table */
+/* TODO - should there be another table that has the available statuss? */
 CREATE TABLE rentals(cust_id int, foreign key(cust_id) references customer(id), movie_id int, status text, checkout_time datetime);
 
 CREATE CLUSTERED INDEX rental_cust_idx on rentals (cust_id);

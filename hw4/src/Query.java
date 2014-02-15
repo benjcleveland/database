@@ -35,6 +35,15 @@ public class Query {
 					 + "FROM movie_directors x, directors y "
 					 + "WHERE x.mid = ? and x.did = y.id";
 	private PreparedStatement directorMidStatement;
+	
+	private static final String ACTOR_MID_SQL = "SELECT a.* "
+					+ "FROM actor a, casts c " 
+					+ "WHERE a.id = c.pid and c.mid = ?";
+	private PreparedStatement actorMidStatement;
+	
+	private static final String RENTAL_MID_SQL = "SELECT * "
+			+ "FROM rentals r "
+			+ "WHERE r.movie_id = ?";
 
 	/* uncomment, and edit, after your create your own customer database */
 	/*
@@ -121,7 +130,7 @@ public class Query {
 		*/
 
 		/* add here more prepare statements for all the other queries you need */
-		/* . . . . . . */
+		actorMidStatement = conn.prepareStatement(ACTOR_MID_SQL);
 	}
 
 
@@ -211,7 +220,17 @@ public class Query {
 						+ " " + director_set.getString(2));
 			}
 			director_set.close();
+			
 			/* now you need to retrieve the actors, in the same manner */
+			actorMidStatement.clearParameters();
+			actorMidStatement.setInt(1, mid);
+			ResultSet actor_set = actorMidStatement.executeQuery();
+			while(actor_set.next()) {
+				System.out.println("\t\tActor: " + actor_set.getString(2)
+						+ " " + actor_set.getString(3));
+			}
+			actor_set.close();
+			
 			/* then you have to find the status: of "AVAILABLE" "YOU HAVE IT", "UNAVAILABLE" */
 		}
 		movie_set.close();
