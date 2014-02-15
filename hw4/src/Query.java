@@ -75,6 +75,10 @@ public class Query {
 	private PreparedStatement rollbackTransactionStatement;
 	*/
 	
+	private static final String CUSTOMER_NAME_SQL = "SELECT * "
+			+ "FROM customer "
+			+ "WHERE id = ?";
+	private PreparedStatement customerNameStatement;
 
 	public Query(String configFilename) {
 		this.configFilename = configFilename;
@@ -163,6 +167,7 @@ public class Query {
 		actorMovieStatement = conn.prepareStatement(ACTOR_MOVIE_SQL);
 		
 		rentalMidStatement = customerConn.prepareStatement(RENTAL_MID_SQL);
+		customerNameStatement = customerConn.prepareStatement(CUSTOMER_NAME_SQL);
 	}
 
 
@@ -179,8 +184,16 @@ public class Query {
 
 	public String getCustomerName(int cid) throws Exception {
 		/* Find the first and last name of the current customer. */
-		return ("JoeFirstName" + " " + "JoeLastName");
-
+		String name = "Unknown Name";
+		
+		customerNameStatement.clearParameters();
+		customerNameStatement.setInt(1, cid);
+		ResultSet name_set = customerNameStatement.executeQuery();
+		if (name_set.next())
+			name = name_set.getString("firstname") + " " + name_set.getString("lastname");
+		
+		name_set.close();
+		return name; 
 	}
 
 	public boolean isValidPlan(int planid) throws Exception {
@@ -222,6 +235,8 @@ public class Query {
 
 	public void transaction_printPersonalData(int cid) throws Exception {
 		/* println the customer's personal data: name, and plan number */
+		
+		System.out.println(getCustomerName(cid));
 	}
 
 
