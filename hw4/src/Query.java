@@ -41,6 +41,18 @@ public class Query {
 					+ "WHERE a.id = c.pid and c.mid = ?";
 	private PreparedStatement actorMidStatement;
 	
+	private static final String DIRECTOR_MOVIE_SQL = "SELECT m.id, y.* "
+					 + "FROM movie_directors x, directors y, movie m "
+					 + "WHERE x.mid = m.id and x.did = y.id and m.name like ? "
+					 + "ORDER BY m.id";
+	private PreparedStatement directorMovieStatement;
+	
+	private static final String ACTOR_MOVIE_SQL = "SELECT m.id, a.* "
+					+ "FROM actor a, casts c, movie m " 
+					+ "WHERE a.id = c.pid and c.mid = m.id and m.name like ? "
+					+ "ORDER BY	m.id";
+	private PreparedStatement actorMovieStatement;
+	
 	private static final String RENTAL_MID_SQL = "SELECT r.* "
 			+ "FROM rentals r "
 			+ "WHERE r.movie_id = ? and r.status not like 'closed'";
@@ -136,6 +148,7 @@ public class Query {
 	public void prepareStatements() throws Exception {
 
 		directorMidStatement = conn.prepareStatement(DIRECTOR_MID_SQL);
+		directorMovieStatement = conn.prepareStatement(DIRECTOR_MOVIE_SQL);
 
 		/* uncomment after you create your customers database */
 		/*
@@ -147,6 +160,7 @@ public class Query {
 
 		/* add here more prepare statements for all the other queries you need */
 		actorMidStatement = conn.prepareStatement(ACTOR_MID_SQL);
+		actorMovieStatement = conn.prepareStatement(ACTOR_MOVIE_SQL);
 		
 		rentalMidStatement = customerConn.prepareStatement(RENTAL_MID_SQL);
 	}
@@ -250,18 +264,20 @@ public class Query {
 			actor_set.close();
 			
 			/* then you have to find the status: of "AVAILABLE" "YOU HAVE IT", "UNAVAILABLE" */
+			/*
 			rentalMidStatement.clearParameters();
 			rentalMidStatement.setInt(1, mid);
 			ResultSet rental_set = rentalMidStatement.executeQuery();
 			String rental_status = "AVAILABLE";
 			while(rental_set.next()) {
 				if(rental_set.getInt("cust_id") == cid)
-					rental_status = "YOU HAVE IT";
+					rental_status = "YOU CURRENTLY HAVE IT";
 				else
 					rental_status = "UNAVAILABLE";
 			}
 			System.out.println("\t\tRental Status: " + rental_status);
 			rental_set.close();
+			*/
 		}
 		movie_set.close();
 		System.out.println();
@@ -291,6 +307,54 @@ public class Query {
 		   Needs to run three SQL queries: (a) movies, (b) movies join directors, (c) movies join actors
 		   Answers are sorted by mid.
 		   Then merge-joins the three answer sets */
+		
+		/* Interpolate the movie title into the SQL string */
+		String searchSql = SEARCH_SQL_BEGIN + movie_title + SEARCH_SQL_END;
+		
+		Statement searchStatement = conn.createStatement();
+		ResultSet movie_set = searchStatement.executeQuery(searchSql);
+		
+		directorMovieStatement.clearParameters();
+		directorMovieStatement.setString(1, "%" + movie_title + "%");
+		ResultSet director_set = directorMovieStatement.executeQuery();
+		director_set.next();
+
+		actorMovieStatement.clearParameters();
+		actorMovieStatement.setString(1, "%" + movie_title + "%");
+		ResultSet actor_set = actorMovieStatement.executeQuery();
+		actor_set.next();
+		
+		// do the 'merge-join'
+		while(movie_set.next()) {
+			int mid = movie_set.getInt(1);
+			System.out.println("ID: " + mid + " NAME: "
+					+ movie_set.getString(2) + " YEAR: "
+					+ movie_set.getString(3));
+			
+			/* do a merge-join with directors */
+			if(director_set.isAfterLast() == false) {
+				while (director_set.getInt(1) == mid) {
+					System.out.println("\t\tDirector: " + director_set.getString(4)
+							+ " " + director_set.getString(3));
+					if(!director_set.next())
+						break;
+				}
+			}
+			
+			/* now you need to retrieve the actors, in the same manner */
+			if(actor_set.isAfterLast() == false) {
+				while(actor_set.getInt(1) == mid) {
+					System.out.println("\t\tActor: " + actor_set.getString("fname")
+							+ " " + actor_set.getString("lname"));
+					if(!actor_set.next())
+						break;
+				}
+			}
+		}
+		
+		movie_set.close();
+		director_set.close();
+		actor_set.close();
 	}
 
 
