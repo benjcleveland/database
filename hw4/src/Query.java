@@ -60,7 +60,7 @@ public class Query {
 
 	/* uncomment, and edit, after your create your own customer database */
 	private static final String CUSTOMER_LOGIN_SQL = 
-		"SELECT * FROM customer WHERE login = ? and password = ?";
+		"SELECT * FROM customer WHERE login like ? and password like ?";
 	private PreparedStatement customerLoginStatement;
 
 	/*
@@ -151,8 +151,8 @@ public class Query {
 		directorMovieStatement = conn.prepareStatement(DIRECTOR_MOVIE_SQL);
 
 		/* uncomment after you create your customers database */
-		/*
 		customerLoginStatement = customerConn.prepareStatement(CUSTOMER_LOGIN_SQL);
+		/*
 		beginTransactionStatement = customerConn.prepareStatement(BEGIN_TRANSACTION_SQL);
 		commitTransactionStatement = customerConn.prepareStatement(COMMIT_SQL);
 		rollbackTransactionStatement = customerConn.prepareStatement(ROLLBACK_SQL);
@@ -204,19 +204,20 @@ public class Query {
 		/* authenticates the user, and returns the user id, or -1 if authentication fails */
 
 		/* Uncomment after you create your own customers database */
-		/*
 		int cid;
 
 		customerLoginStatement.clearParameters();
 		customerLoginStatement.setString(1,name);
 		customerLoginStatement.setString(2,password);
 		ResultSet cid_set = customerLoginStatement.executeQuery();
-		if (cid_set.next()) cid = cid_set.getInt(1);
-		else cid = -1;
+		if (cid_set.next()) 
+			cid = cid_set.getInt(1);
+		else 
+			cid = -1;
+		
 		cid_set.close();
+			
 		return(cid);
-		 */
-		return (2);
 	}
 
 	public void transaction_printPersonalData(int cid) throws Exception {
