@@ -80,6 +80,16 @@ public class Query {
 			+ "WHERE id = ?";
 	private PreparedStatement customerNameStatement;
 
+	private static final String CUSTOMER_PLAN_SQL = "SELECT p.* "
+			+ "FROM customer c, plans p "
+			+ "WHERE c.plan_id = p.id and c.id = ?";
+	private PreparedStatement customerPlanStatement;
+	
+	private static final String CUSTOMER_RENTALS_SQL = "SELECT count(*) as num_rentals "
+			+ "FROM customer c, rentals r "
+			+ "WHERE c.id = r.cust_id and c.id = ? and r.status like 'open'";
+	private PreparedStatement customerRentalStatement;
+	
 	public Query(String configFilename) {
 		this.configFilename = configFilename;
 	}
@@ -168,6 +178,8 @@ public class Query {
 		
 		rentalMidStatement = customerConn.prepareStatement(RENTAL_MID_SQL);
 		customerNameStatement = customerConn.prepareStatement(CUSTOMER_NAME_SQL);
+		customerPlanStatement = customerConn.prepareStatement(CUSTOMER_PLAN_SQL);
+		customerRentalStatement = customerConn.prepareStatement(CUSTOMER_RENTALS_SQL);
 	}
 
 
@@ -179,7 +191,28 @@ public class Query {
 		/* How many movies can she/he still rent?
 		   You have to compute and return the difference between the customer's plan
 		   and the count of outstanding rentals */
-		return (99);
+		int max_rentals = 0;
+		int curr_rentals = 0;
+		
+		customerPlanStatement.clearParameters();
+		customerPlanStatement.setInt(1, cid);
+		ResultSet plan_set = customerPlanStatement.executeQuery();
+		
+		if(plan_set.next())
+			max_rentals = plan_set.getInt("max_rentals");
+		plan_set.close();
+		
+		customerRentalStatement.clearParameters();
+		customerRentalStatement.setInt(1, cid);
+		ResultSet rental_set = customerRentalStatement.executeQuery();
+		
+		if(rental_set.next())
+			curr_rentals = rental_set.getInt("num_rentals");
+		
+		rental_set.close();
+		
+		// determine the number of outstanding rentals
+		return (max_rentals - curr_rentals);
 	}
 
 	public String getCustomerName(int cid) throws Exception {
@@ -237,6 +270,7 @@ public class Query {
 		/* println the customer's personal data: name, and plan number */
 		
 		System.out.println(getCustomerName(cid));
+		System.out.println("Remaining Rentals: " + getRemainingRentals(cid));
 	}
 
 
