@@ -22,6 +22,7 @@ CREATE TABLE status(id int primary key, status text);
 
 /* create the rental table */
 /* TODO - should there be another table that has the available statuss? */
+/* TODO - set constraints like not null, etc on things like movieid and status */
 CREATE TABLE rentals(cust_id int, foreign key(cust_id) references customer(id), movie_id int, status text, checkout_time datetime);
 
 CREATE CLUSTERED INDEX rental_cust_idx on rentals (cust_id);
