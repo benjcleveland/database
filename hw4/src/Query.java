@@ -100,6 +100,10 @@ public class Query {
 			+ "WHERE id = ?";
 	private PreparedStatement updatePlanStatement;
 	
+	private static final String VALID_MOVIE_SQL = "SELECT * "
+			+ "FROM movie WHERE id = ?"; 
+	private PreparedStatement validMovieStatement;
+	
 	public Query(String configFilename) {
 		this.configFilename = configFilename;
 	}
@@ -171,6 +175,7 @@ public class Query {
 
 		directorMidStatement = conn.prepareStatement(DIRECTOR_MID_SQL);
 		directorMovieStatement = conn.prepareStatement(DIRECTOR_MOVIE_SQL);
+		validMovieStatement = conn.prepareStatement(VALID_MOVIE_SQL);
 
 		/* uncomment after you create your customers database */
 		customerLoginStatement = customerConn.prepareStatement(CUSTOMER_LOGIN_SQL);
@@ -246,13 +251,21 @@ public class Query {
 		ResultSet valid_set = validPlanStatement.executeQuery();
 		if(valid_set.next())
 			valid_plan = true;
+		valid_set.close();
 		
 		return valid_plan;
 	}
 
 	public boolean isValidMovie(int mid) throws Exception {
 		/* is mid a valid movie ID?  You have to figure it out */
-		return true;
+		boolean valid_movie = false;
+		validMovieStatement.clearParameters();
+		validMovieStatement.setInt(1, mid);
+		ResultSet valid_set = validMovieStatement.executeQuery();
+		if(valid_set.next())
+			valid_movie = true;
+		valid_set.close();
+		return valid_movie;
 	}
 
 	private int getRenterID(int mid) throws Exception {
@@ -383,6 +396,11 @@ public class Query {
 	public void transaction_rent(int cid, int mid) throws Exception {
 	    /* rent the movie mid to the customer cid */
 	    /* remember to enforce consistency ! */
+		// make sure the movie is valid
+		if(isValidMovie(mid) == false) {
+			System.out.println("You choose an invalid movie id...");
+			return;
+		}
 	}
 
 	public void transaction_return(int cid, int mid) throws Exception {
