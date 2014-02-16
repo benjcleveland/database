@@ -63,7 +63,6 @@ public class Query {
 		"SELECT * FROM customer WHERE login like ? and password like ?";
 	private PreparedStatement customerLoginStatement;
 
-	/*
 	private static final String BEGIN_TRANSACTION_SQL = 
 		"SET TRANSACTION ISOLATION LEVEL SERIALIZABLE; BEGIN TRANSACTION;";
 	private PreparedStatement beginTransactionStatement;
@@ -73,7 +72,6 @@ public class Query {
 
 	private static final String ROLLBACK_SQL = "ROLLBACK TRANSACTION";
 	private PreparedStatement rollbackTransactionStatement;
-	*/
 	
 	private static final String CUSTOMER_NAME_SQL = "SELECT * "
 			+ "FROM customer "
@@ -89,6 +87,18 @@ public class Query {
 			+ "FROM customer c, rentals r "
 			+ "WHERE c.id = r.cust_id and c.id = ? and r.status like 'open'";
 	private PreparedStatement customerRentalStatement;
+	
+	private static final String PLANS_SQL = "SELECT * FROM plans";
+	private PreparedStatement plansStatement;
+	
+	private static final String VALID_PLAN_SQL = "SELECT * "
+			+ "FROM plans WHERE id = ?";
+	private PreparedStatement validPlanStatement;
+	
+	private static final String UPDATE_PLAN_SQL = "UPDATE customer "
+			+ "SET plan_id = ? "
+			+ "WHERE id = ?";
+	private PreparedStatement updatePlanStatement;
 	
 	public Query(String configFilename) {
 		this.configFilename = configFilename;
@@ -145,8 +155,6 @@ public class Query {
 						   jSQLPassword); // password
                 
 		customerConn.setAutoCommit(true); //by default automatically commit after each statement 
-
-	        
 	}
 
 	public void closeConnection() throws Exception {
@@ -166,11 +174,9 @@ public class Query {
 
 		/* uncomment after you create your customers database */
 		customerLoginStatement = customerConn.prepareStatement(CUSTOMER_LOGIN_SQL);
-		/*
 		beginTransactionStatement = customerConn.prepareStatement(BEGIN_TRANSACTION_SQL);
 		commitTransactionStatement = customerConn.prepareStatement(COMMIT_SQL);
 		rollbackTransactionStatement = customerConn.prepareStatement(ROLLBACK_SQL);
-		*/
 
 		/* add here more prepare statements for all the other queries you need */
 		actorMidStatement = conn.prepareStatement(ACTOR_MID_SQL);
@@ -180,6 +186,9 @@ public class Query {
 		customerNameStatement = customerConn.prepareStatement(CUSTOMER_NAME_SQL);
 		customerPlanStatement = customerConn.prepareStatement(CUSTOMER_PLAN_SQL);
 		customerRentalStatement = customerConn.prepareStatement(CUSTOMER_RENTALS_SQL);
+		plansStatement = customerConn.prepareStatement(PLANS_SQL);
+		validPlanStatement = customerConn.prepareStatement(VALID_PLAN_SQL);
+		updatePlanStatement = customerConn.prepareStatement(UPDATE_PLAN_SQL);
 	}
 
 
@@ -231,7 +240,14 @@ public class Query {
 
 	public boolean isValidPlan(int planid) throws Exception {
 		/* Is planid a valid plan ID?  You have to figure it out */
-		return true;
+		boolean valid_plan = false;
+		validPlanStatement.clearParameters();
+		validPlanStatement.setInt(1, planid);
+		ResultSet valid_set = validPlanStatement.executeQuery();
+		if(valid_set.next())
+			valid_plan = true;
+		
+		return valid_plan;
 	}
 
 	public boolean isValidMovie(int mid) throws Exception {
@@ -334,10 +350,31 @@ public class Query {
 	public void transaction_choosePlan(int cid, int pid) throws Exception {
 	    /* updates the customer's plan to pid: UPDATE customer SET plid = pid */
 	    /* remember to enforce consistency ! */
+		beginTransaction();
+		
+		// update the plan
+		updatePlanStatement.clearParameters();
+		updatePlanStatement.setInt(1, pid);
+		updatePlanStatement.setInt(2, cid);
+		updatePlanStatement.executeUpdate();
+		
+		// get the number of rentals
+		if(getRemainingRentals(cid) < 0)
+			rollbackTransaction();
+		else
+			commitTransaction();
 	}
 
 	public void transaction_listPlans() throws Exception {
 	    /* println all available plans: SELECT * FROM plan */
+		ResultSet plan_set = plansStatement.executeQuery();
+		while(plan_set.next()) {
+			System.out.println("Plan ID: " + plan_set.getString("id")); 
+			System.out.println("\tName: " + plan_set.getString("name")); 
+			System.out.println("\tMax Rentals: " + plan_set.getInt("max_rentals"));
+			System.out.println("\tPrice: $" + plan_set.getInt("monthly_fee"));
+		}
+		plan_set.close();
 	}
 
 	public void transaction_rent(int cid, int mid) throws Exception {
@@ -409,20 +446,18 @@ public class Query {
     /* Uncomment helpers below once you've got beginTransactionStatement,
        commitTransactionStatement, and rollbackTransactionStatement setup from
        prepareStatements():
-    
-       public void beginTransaction() throws Exception {
+    */
+	public void beginTransaction() throws Exception {
 	    customerConn.setAutoCommit(false);
 	    beginTransactionStatement.executeUpdate();	
-        }
+    }
 
-        public void commitTransaction() throws Exception {
+    public void commitTransaction() throws Exception {
 	    commitTransactionStatement.executeUpdate();	
 	    customerConn.setAutoCommit(true);
-	}
-        public void rollbackTransaction() throws Exception {
+    }
+    public void rollbackTransaction() throws Exception {
 	    rollbackTransactionStatement.executeUpdate();
 	    customerConn.setAutoCommit(true);
-	    } 
-    */
-
+	} 
 }
