@@ -178,6 +178,7 @@ public class Query {
 						   jSQLPassword); // password
                 
 		customerConn.setAutoCommit(true); //by default automatically commit after each statement 
+		customerConn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
 	}
 
 	public void closeConnection() throws Exception {
