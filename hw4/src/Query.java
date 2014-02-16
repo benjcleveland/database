@@ -113,6 +113,16 @@ public class Query {
 			+ "VALUES (?, ?, 'open', current_timestamp)";
 	private PreparedStatement rentMovieStatement;
 	
+	private static final String MOVIE_RENTER_SQL = "SELECT cust_id "
+			+ "FROM rentals "
+			+ "where movie_id = ? and status like 'open'";
+	private PreparedStatement movieRenterStatement;
+	
+	private static final String RETURN_MOVIE_SQL = "UPDATE rentals "
+			+ "SET status = 'closed' "
+			+ "WHERE cust_id = ? and movie_id = ? and status like 'open'";
+	private PreparedStatement returnMovieStatement;
+	
 	public Query(String configFilename) {
 		this.configFilename = configFilename;
 	}
@@ -205,6 +215,8 @@ public class Query {
 		updatePlanStatement = customerConn.prepareStatement(UPDATE_PLAN_SQL);
 		numRentersStatement = customerConn.prepareStatement(NUM_RENTERS_SQL);
 		rentMovieStatement = customerConn.prepareStatement(RENT_MOVIE_SQL);
+		movieRenterStatement = customerConn.prepareStatement(MOVIE_RENTER_SQL);
+		returnMovieStatement = customerConn.prepareStatement(RETURN_MOVIE_SQL);
 	}
 
 
@@ -294,7 +306,14 @@ public class Query {
 
 	private int getRenterID(int mid) throws Exception {
 		/* Find the customer id (cid) of whoever currently rents the movie mid; return -1 if none */
-		return (77);
+		int customer_id = -1;
+		movieRenterStatement.clearParameters();
+		movieRenterStatement.setInt(1, mid);
+		ResultSet renter_set = movieRenterStatement.executeQuery();
+		if(renter_set.next())
+			customer_id = renter_set.getInt("cust_id");
+		renter_set.close();
+		return customer_id;
 	}
 
     /**********************************************************/
@@ -449,6 +468,21 @@ public class Query {
 
 	public void transaction_return(int cid, int mid) throws Exception {
 	    /* return the movie mid by the customer cid */
+		if(isValidMovie(mid) == false) {
+			System.out.println("You choose an invalid movie id...");
+			return;
+		}
+		
+		// make sure the customer currently has the movie rented
+		if(getRenterID(mid) == cid) {
+			// set the movie as returned
+			returnMovieStatement.clearParameters();
+			returnMovieStatement.setInt(1, cid);
+			returnMovieStatement.setInt(2, mid);
+			returnMovieStatement.executeUpdate();
+		} else {
+			System.out.println("You do not currently have this movie rented.");
+		}
 	}
 
 	public void transaction_fastSearch(int cid, String movie_title)
