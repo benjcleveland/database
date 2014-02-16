@@ -18,7 +18,7 @@ INSERT INTO customer VALUES (6, 'cindy', 'asdf', 'Cindy', 'Cleveland', 2);
 INSERT INTO customer VALUES (7, 'sophia', 'asdf', 'Sophia', 'Terada', 3);
 INSERT INTO customer VALUES (8, 'derek', 'asdf', 'Derek', 'Terada', 4);
 
-CREATE TABLE status(id int primary key, status text);
+CREATE TABLE status(status text primary key);
 
 /* create the rental table */
 /* TODO - should there be another table that has the available statuss? */
