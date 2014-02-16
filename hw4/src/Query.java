@@ -104,6 +104,15 @@ public class Query {
 			+ "FROM movie WHERE id = ?"; 
 	private PreparedStatement validMovieStatement;
 	
+	private static final String NUM_RENTERS_SQL = "SELECT count(*) "
+			+ "FROM rentals "
+			+ "WHERE movie_id = ? and status like 'open'";
+	private PreparedStatement numRentersStatement;
+	
+	private static final String RENT_MOVIE_SQL = "INSERT INTO rentals "
+			+ "VALUES (?, ?, 'open', current_timestamp)";
+	private PreparedStatement rentMovieStatement;
+	
 	public Query(String configFilename) {
 		this.configFilename = configFilename;
 	}
@@ -194,6 +203,8 @@ public class Query {
 		plansStatement = customerConn.prepareStatement(PLANS_SQL);
 		validPlanStatement = customerConn.prepareStatement(VALID_PLAN_SQL);
 		updatePlanStatement = customerConn.prepareStatement(UPDATE_PLAN_SQL);
+		numRentersStatement = customerConn.prepareStatement(NUM_RENTERS_SQL);
+		rentMovieStatement = customerConn.prepareStatement(RENT_MOVIE_SQL);
 	}
 
 
@@ -266,6 +277,19 @@ public class Query {
 			valid_movie = true;
 		valid_set.close();
 		return valid_movie;
+	}
+	
+	private int getNumRenters(int mid) throws Exception {
+		/* finds the number of renters currently renting a movie */
+		int num_renters = 0;
+		numRentersStatement.clearParameters();
+		numRentersStatement.setInt(1, mid);
+		ResultSet renters_set = numRentersStatement.executeQuery();
+		if(renters_set.next())
+			num_renters = renters_set.getInt(1);
+		
+		renters_set.close();
+		return num_renters;
 	}
 
 	private int getRenterID(int mid) throws Exception {
@@ -405,13 +429,22 @@ public class Query {
 		beginTransaction();
 		
 		// insert into the rentals list
+		rentMovieStatement.clearParameters();
+		rentMovieStatement.setInt(1, cid);
+		rentMovieStatement.setInt(2, mid);
+		rentMovieStatement.executeUpdate();
 		
-		// make sure we are not over our limit
-		if(getRemainingRentals(cid) < 0)
-			rollbackTransaction();
-	
 		// make sure no one else is renting this movie
-		commitTransaction();
+		if(getNumRenters(mid) != 1) {
+			rollbackTransaction();
+			System.out.println("Sorry, this moive has already been rented...");
+		} else if(getRemainingRentals(cid) < 0) {
+			// make sure we are not over our limit
+			rollbackTransaction();
+			System.out.println("Sorry, you are at your rental limit, return movies or upgrade your plan to rent more!");
+		} else {	
+			commitTransaction();
+		}
 	}
 
 	public void transaction_return(int cid, int mid) throws Exception {
