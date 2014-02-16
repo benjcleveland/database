@@ -401,6 +401,17 @@ public class Query {
 			System.out.println("You choose an invalid movie id...");
 			return;
 		}
+		
+		beginTransaction();
+		
+		// insert into the rentals list
+		
+		// make sure we are not over our limit
+		if(getRemainingRentals(cid) < 0)
+			rollbackTransaction();
+	
+		// make sure no one else is renting this movie
+		commitTransaction();
 	}
 
 	public void transaction_return(int cid, int mid) throws Exception {
