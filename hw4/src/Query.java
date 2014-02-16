@@ -359,8 +359,11 @@ public class Query {
 		updatePlanStatement.executeUpdate();
 		
 		// get the number of rentals
-		if(getRemainingRentals(cid) < 0)
+		if(getRemainingRentals(cid) < 0) {
 			rollbackTransaction();
+			System.out.println("Cannot choose this plan because you have too many rentals.");
+			System.out.println("Please return movies to change to this plan.");
+		}
 		else
 			commitTransaction();
 	}
