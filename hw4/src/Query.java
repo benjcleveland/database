@@ -21,16 +21,16 @@ public class Query {
 
 	// DB Connection
 	private Connection conn;
-        private Connection customerConn;
+    private Connection customerConn;
 
 	// Canned queries
 
 	// LIKE does a case-insensitive match
-	private static final String SEARCH_SQL_BEGIN =
-		"SELECT * FROM movie WHERE name LIKE '%";
-	private static final String SEARCH_SQL_END = 
-		"%' ORDER BY id";
-
+	private static final String SEARCH_SQL = "SELECT * " 
+			+ "FROM movie "
+			+ "WHERE name LIKE ? ORDER BY id";
+	private PreparedStatement searchMovieStatement;
+	
 	private static final String DIRECTOR_MID_SQL = "SELECT y.* "
 					 + "FROM movie_directors x, directors y "
 					 + "WHERE x.mid = ? and x.did = y.id";
@@ -193,6 +193,7 @@ public class Query {
 
 	public void prepareStatements() throws Exception {
 
+		searchMovieStatement = conn.prepareStatement(SEARCH_SQL);
 		directorMidStatement = conn.prepareStatement(DIRECTOR_MID_SQL);
 		directorMovieStatement = conn.prepareStatement(DIRECTOR_MOVIE_SQL);
 		validMovieStatement = conn.prepareStatement(VALID_MOVIE_SQL);
@@ -357,10 +358,9 @@ public class Query {
 		   AVAILABLE, or UNAVAILABLE, or YOU CURRENTLY RENT IT */
 
 		/* Interpolate the movie title into the SQL string */
-		String searchSql = SEARCH_SQL_BEGIN + movie_title + SEARCH_SQL_END;
-		
-		Statement searchStatement = conn.createStatement();
-		ResultSet movie_set = searchStatement.executeQuery(searchSql);
+		searchMovieStatement.clearParameters();
+		searchMovieStatement.setString(1, "%" + movie_title + "%");
+		ResultSet movie_set = searchMovieStatement.executeQuery();
 		while (movie_set.next()) {
 			int mid = movie_set.getInt(1);
 			System.out.println("ID: " + mid + " NAME: "
@@ -494,10 +494,9 @@ public class Query {
 		   Then merge-joins the three answer sets */
 		
 		/* Interpolate the movie title into the SQL string */
-		String searchSql = SEARCH_SQL_BEGIN + movie_title + SEARCH_SQL_END;
-		
-		Statement searchStatement = conn.createStatement();
-		ResultSet movie_set = searchStatement.executeQuery(searchSql);
+		searchMovieStatement.clearParameters();
+		searchMovieStatement.setString(1, "%" + movie_title + "%");
+		ResultSet movie_set = searchMovieStatement.executeQuery();
 		
 		directorMovieStatement.clearParameters();
 		directorMovieStatement.setString(1, "%" + movie_title + "%");
