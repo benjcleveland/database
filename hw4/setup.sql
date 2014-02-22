@@ -38,11 +38,11 @@ CREATE TABLE rentals(cust_id int, foreign key(cust_id) references customer(id), 
 
 CREATE CLUSTERED INDEX rental_cust_idx on rentals (cust_id);
 
-INSERT INTO rentals VALUES (1, 1, 'closed', current_timestamp);
-INSERT INTO rentals VALUES (1, 2, 'closed', current_timestamp);
-INSERT INTO rentals VALUES (1, 3, 'closed', current_timestamp);
-INSERT INTO rentals VALUES (1, 4, 'open',   current_timestamp);
-INSERT INTO rentals VALUES (2, 1, 'open',   current_timestamp);
-INSERT INTO rentals VALUES (3, 1, 'closed', current_timestamp);
-INSERT INTO rentals VALUES (4, 2, 'closed', current_timestamp);
-INSERT INTO rentals VALUES (5, 3, 'closed', current_timestamp);
+INSERT INTO rentals VALUES (1, 588277,  'closed',   current_timestamp);
+INSERT INTO rentals VALUES (1, 596234,  'closed',   current_timestamp);
+INSERT INTO rentals VALUES (1, 597885,  'closed',   current_timestamp);
+INSERT INTO rentals VALUES (1, 1532670, 'open',     current_timestamp);
+INSERT INTO rentals VALUES (2, 1472171, 'open',     current_timestamp);
+INSERT INTO rentals VALUES (3, 1388612, 'closed',   current_timestamp);
+INSERT INTO rentals VALUES (4, 1532670, 'closed',   current_timestamp);
+INSERT INTO rentals VALUES (5, 1289908, 'open',     current_timestamp);

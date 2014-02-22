@@ -55,12 +55,12 @@ public class Query {
 	
 	private static final String RENTAL_MID_SQL = "SELECT r.* "
 			+ "FROM rentals r "
-			+ "WHERE r.movie_id = ? and r.status not like 'closed'";
+			+ "WHERE r.movie_id = ? and r.status != 'closed'";
 	private PreparedStatement rentalMidStatement;
 
 	/* uncomment, and edit, after your create your own customer database */
 	private static final String CUSTOMER_LOGIN_SQL = 
-		"SELECT * FROM customer WHERE login like ? and password like ?";
+		"SELECT * FROM customer WHERE login = ? and password like ?";
 	private PreparedStatement customerLoginStatement;
 
 	private static final String BEGIN_TRANSACTION_SQL = 
@@ -85,7 +85,7 @@ public class Query {
 	
 	private static final String CUSTOMER_RENTALS_SQL = "SELECT count(*) as num_rentals "
 			+ "FROM customer c, rentals r "
-			+ "WHERE c.id = r.cust_id and c.id = ? and r.status like 'open'";
+			+ "WHERE c.id = r.cust_id and c.id = ? and r.status = 'open'";
 	private PreparedStatement customerRentalStatement;
 	
 	private static final String PLANS_SQL = "SELECT * FROM plans";
@@ -106,7 +106,7 @@ public class Query {
 	
 	private static final String NUM_RENTERS_SQL = "SELECT count(*) "
 			+ "FROM rentals "
-			+ "WHERE movie_id = ? and status like 'open'";
+			+ "WHERE movie_id = ? and status = 'open'";
 	private PreparedStatement numRentersStatement;
 	
 	private static final String RENT_MOVIE_SQL = "INSERT INTO rentals "
@@ -115,12 +115,12 @@ public class Query {
 	
 	private static final String MOVIE_RENTER_SQL = "SELECT cust_id "
 			+ "FROM rentals "
-			+ "where movie_id = ? and status like 'open'";
+			+ "where movie_id = ? and status = 'open'";
 	private PreparedStatement movieRenterStatement;
 	
 	private static final String RETURN_MOVIE_SQL = "UPDATE rentals "
 			+ "SET status = 'closed' "
-			+ "WHERE cust_id = ? and movie_id = ? and status like 'open'";
+			+ "WHERE cust_id = ? and movie_id = ? and status = 'open'";
 	private PreparedStatement returnMovieStatement;
 	
 	public Query(String configFilename) {
@@ -432,7 +432,7 @@ public class Query {
 			System.out.println("Plan ID: " + plan_set.getString("id")); 
 			System.out.println("\tName: " + plan_set.getString("name")); 
 			System.out.println("\tMax Rentals: " + plan_set.getInt("max_rentals"));
-			System.out.println("\tPrice: $" + plan_set.getInt("monthly_fee"));
+			System.out.println("\tPrice: $" + String.format( "%.2f", plan_set.getDouble("monthly_fee")));
 		}
 		plan_set.close();
 	}
