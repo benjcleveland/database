@@ -163,6 +163,7 @@ public class Query {
 		/* You will also want to appropriately set the 
                    transaction's isolation level through:  
 		   conn.setTransactionIsolation(...) */
+		conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
 
 		/* Also you will put code here to specify the connection to your
 		   customer DB.  E.g.
