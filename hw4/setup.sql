@@ -1,13 +1,21 @@
+/*
+ Ben Cleveland
+ CSEP 544
+ Homework 4
+ Table setup
+*/
+
 /* create the plan table */
-CREATE TABLE plans(id int primary key, name text, max_rentals int, monthly_fee int);
+CREATE TABLE plans(id int primary key, name varchar(255) NOT NULL UNIQUE, max_rentals int NOT NULL, monthly_fee decimal(18,2) NOT NULL);
 
 INSERT INTO plans VALUES (1, 'Basic', 1, 5);
 INSERT INTO plans VALUES (2, 'Basic plus', 3, 10);
-INSERT INTO plans VALUES (3, 'Normal', 5, 15);
+INSERT INTO plans VALUES (3, 'Normal', 5, 14.99);
 INSERT INTO plans VALUES (4, 'Super Access', 8, 20);
 
 /* create the customer table */
-CREATE TABLE customer(id int primary key, login text, password text, firstname text, lastname text, plan_id int, foreign key (plan_id ) references plans(id));
+CREATE TABLE customer(id int primary key, login varchar(255) NOT NULL UNIQUE, password text NOT NULL, 
+    firstname text, lastname text, plan_id int, foreign key (plan_id ) references plans(id));
 
 INSERT INTO customer VALUES (1, 'ben', 'asdf', 'Ben', 'Cleveland', 1);
 INSERT INTO customer VALUES (2, 'phil', 'asdf', 'Phil', 'Nissley', 2);
@@ -18,12 +26,15 @@ INSERT INTO customer VALUES (6, 'cindy', 'asdf', 'Cindy', 'Cleveland', 2);
 INSERT INTO customer VALUES (7, 'sophia', 'asdf', 'Sophia', 'Terada', 3);
 INSERT INTO customer VALUES (8, 'derek', 'asdf', 'Derek', 'Terada', 4);
 
-CREATE TABLE status(status text primary key);
+/* create move status 'enumeration' table */
+CREATE TABLE movie_status(status varchar(10) primary key);
+
+INSERT INTO movie_status VALUES('open');
+INSERT INTO movie_status VALUES('closed');
 
 /* create the rental table */
-/* TODO - should there be another table that has the available statuss? */
-/* TODO - set constraints like not null, etc on things like movieid and status */
-CREATE TABLE rentals(cust_id int, foreign key(cust_id) references customer(id), movie_id int, status text, checkout_time datetime);
+CREATE TABLE rentals(cust_id int, foreign key(cust_id) references customer(id), movie_id int NOT NULL, 
+    status varchar(10) NOT NULL, foreign key(status) references movie_status(status), checkout_time datetime NOT NULL);
 
 CREATE CLUSTERED INDEX rental_cust_idx on rentals (cust_id);
 
