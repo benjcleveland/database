@@ -1,3 +1,10 @@
+/*
+ * Ben Cleveland
+ * CSEP 544
+ * Homework 4 
+ * 
+ */
+
 import java.util.Properties;
 import java.sql.Connection;
 import java.sql.DriverManager;
